@@ -4,12 +4,39 @@ var addInStock = true;
 var order_no = parseInt(localStorage.getItem("order_no")) + 1;
 var order_count = 0;
 var reset_count = 0;
+var interNet = false;
 
 $(document).ready(function(){
 	$("#order_no").val(order_no);
 	$("#order_no_invalid_process").val(order_no);
 	sync();
+	netCheck();
+	setInterval(function(){ netCheck(); }, 5000);
 });
+
+function netCheck(){
+	product_array = JSON.parse(localStorage.getItem("product_details"));
+	$.ajax({
+		type: 'post',
+		url: site_url+'api/product_api.php',
+		data: "",
+		success: function(msg){
+			var data = JSON.parse(msg);
+			if(data.status === "success"){
+				var prod_details = JSON.stringify(data.product);
+				localStorage.setItem("product_details", prod_details);
+				interNet = true;
+			}else{
+				/////do nothing
+			}
+		},
+	    error: function(XMLHttpRequest, textStatus, errorThrown) {
+			alert('No Active network Connection is present!');
+			interNet = false;
+			return false;
+	    }
+	});
+}
 
 function sync(){
 	$("#order_place_panel").hide();	
@@ -79,6 +106,10 @@ function addInList(){
 	document.getElementById("wrappers").className = "";
 	setTimeout(function(){ document.getElementById("wrappers").className = "hidden"; }, 2000);
 	var ordet = localStorage.getItem("order_details");
+	if(!interNet){
+		alert("Please connect to internet to order!");
+		return false;
+	}
 	var d = new Date();
 	var dd = d.getDate();
 	var mm = d.getMonth()+1; //January is 0!
@@ -112,6 +143,11 @@ function addInList(){
 	var size_id = $("#qty_id").val();
 	var qty = $("#product_qty").val();
 	var free_qty = $("#free_qty").val();
+	var temp_stock = $("#temp_stock").val();
+	if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
+		alert("You can't order this product more than "+temp_stock);
+		return false;
+	}
 	var ean_no = $("#ean_no").val();
 	var mrp = $("#mrp").val();
 	var base_purchase_price = $("#base_purchase_price").val();
@@ -126,7 +162,7 @@ function addInList(){
 	var exise_central_amnt_inp = $("#exise_central_amnt_inp").val();
 	var distributor_price = $("#distributor_price").val();
 	
-	var one_order_det = [product_id, product_mf_id, size_id, qty, free_qty, ean_no, mrp, base_purchase_price, distributor_unit_price, vat_percentage_inp, vat_amnt_inp, cst_percentage_inp, cst_amnt_inp, exise_state_percentage_inp, exise_state_amnt_inp, exise_central_percentage_inp, exise_central_amnt_inp, distributor_price, sku, order_count, proName[0]];
+	var one_order_det = [product_id, product_mf_id, size_id, qty, free_qty, ean_no, mrp, base_purchase_price, distributor_unit_price, vat_percentage_inp, vat_amnt_inp, cst_percentage_inp, cst_amnt_inp, exise_state_percentage_inp, exise_state_amnt_inp, exise_central_percentage_inp, exise_central_amnt_inp, distributor_price, sku, order_count, proName[0], temp_stock];
 	
 	if(ordet === null || ordet === "null" || typeof ordet === typeof undefined || ordet == "" || ordet == "[]"){
 		var or_det = [];
@@ -386,6 +422,14 @@ function changeProductQty(dis, order_count, oldQty){
 					{
 						var prev_one_order = prev_order_details[j];
 						if(prev_one_order[19]===order_count){
+							var freeQty = parseInt(prev_one_order[4]);
+							var tempStock = parseInt(prev_one_order[21]);
+							var qt = parseInt(changeQty);
+							if(tempStock<(qt+freeQty)){
+								alert("You can't order this product more than "+tempStock);
+								$(dis).val(oldQty);
+								return false;
+							}
 							prev_one_order[3] = changeQty;
 							prev_order_details[j] = prev_one_order;
 						}
@@ -434,6 +478,14 @@ function changeProductFreeQty(dis, order_count, oldQty){
 					{
 						var prev_one_order = prev_order_details[j];
 						if(prev_one_order[19]===order_count){
+							var freeQty = parseInt(changeQty);
+							var tempStock = parseInt(prev_one_order[21]);
+							var qt = parseInt(prev_one_order[3]);
+							if(tempStock<(qt+freeQty)){
+								alert("You can't order this product more than "+tempStock);
+								$(dis).val(oldQty);
+								return false;
+							}
 							prev_one_order[4] = changeQty;
 							prev_order_details[j] = prev_one_order;
 						}
@@ -455,6 +507,10 @@ function addSaleOrderQuick()
 {
 	document.getElementById("wrappers").className = "";
 	setTimeout(function(){ document.getElementById("wrappers").className = "hidden"; }, 2000);
+	if(!interNet){
+		alert("Please connect to internet to order!");
+		return false;
+	}
 	var ordet = localStorage.getItem("order_details");
 	if(ordet === null || ordet === "null" || typeof ordet === typeof undefined || ordet == "" || ordet == "[]"){
 		alert("Error Occured!");
@@ -522,6 +578,10 @@ function addSaleOrder()
 {
 	document.getElementById("wrappers").className = "";
 	setTimeout(function(){ document.getElementById("wrappers").className = "hidden"; }, 2000);
+	if(!interNet){
+		alert("Please connect to internet to order!");
+		return false;
+	}
 	var ordet = localStorage.getItem("order_details");
 	var d = new Date();
 	var dd = d.getDate();
@@ -556,6 +616,11 @@ function addSaleOrder()
 	var size_id = $("#qty_id").val();
 	var qty = $("#product_qty").val();
 	var free_qty = $("#free_qty").val();
+	var temp_stock = $("#temp_stock").val();
+	if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
+		alert("You can't order this product more than "+temp_stock);
+		return false;
+	}
 	var ean_no = $("#ean_no").val();
 	var mrp = $("#mrp").val();
 	var base_purchase_price = $("#base_purchase_price").val();
@@ -570,7 +635,7 @@ function addSaleOrder()
 	var exise_central_amnt_inp = $("#exise_central_amnt_inp").val();
 	var distributor_price = $("#distributor_price").val();
 	
-	var one_order_det = [product_id, product_mf_id, size_id, qty, free_qty, ean_no, mrp, base_purchase_price, distributor_unit_price, vat_percentage_inp, vat_amnt_inp, cst_percentage_inp, cst_amnt_inp, exise_state_percentage_inp, exise_state_amnt_inp, exise_central_percentage_inp, exise_central_amnt_inp, distributor_price, sku, order_count, proName[0]];
+	var one_order_det = [product_id, product_mf_id, size_id, qty, free_qty, ean_no, mrp, base_purchase_price, distributor_unit_price, vat_percentage_inp, vat_amnt_inp, cst_percentage_inp, cst_amnt_inp, exise_state_percentage_inp, exise_state_amnt_inp, exise_central_percentage_inp, exise_central_amnt_inp, distributor_price, sku, order_count, proName[0], temp_stock];
 	
 	if(ordet === null || ordet === "null" || typeof ordet === typeof undefined || ordet == "" || ordet == "[]"){
 		var or_det = [];
@@ -700,6 +765,7 @@ function fetch_data(prod_name)
 				var qty_id = product_details[i].other_detail.qty_id;
 				var sku = product_details[i].other_detail.sku;
 				var mrp = product_details[i].other_detail.mrp;
+				var temp_stock = product_details[i].other_detail.temp_stock;
 				var base_purchase_price = product_details[i].other_detail.base_purchase_price;
 				if(special_distributor.toLowerCase()==="y"){
 					var distributor_unit_price = product_details[i].other_detail.sp_distributor_unit_price;
@@ -754,6 +820,7 @@ function fetch_data(prod_name)
 				$("#qty_id").val(qty_id);
 				$("#sku").val(sku);
 				$("#mrp").val(mrp);
+				$("#temp_stock").val(temp_stock);
 				$("#base_purchase_price").val(base_purchase_price);
 				$("#distributor_unit_price").val(distributor_unit_price);
 				$("#vat_percentage_inp").val(vat_percentage_inp);
@@ -781,7 +848,7 @@ function loggedOut(){
 
 function addProQty(product_qty)
 {
-	
+	var temp_stock = $("#temp_stock").val();
 	var regex=/^[0-9]+$/;
 	if((product_qty=='')||(product_qty=='0'))
 	{
