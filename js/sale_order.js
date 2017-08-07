@@ -4,7 +4,7 @@ var addInStock = true;
 var order_no = parseInt(localStorage.getItem("order_no")) + 1;
 var order_count = 0;
 var reset_count = 0;
-var interNet = false;
+var interNet = true;
 
 $(document).ready(function(){
 	$("#order_no").val(order_no);
@@ -31,8 +31,8 @@ function netCheck(){
 			}
 		},
 	    error: function(XMLHttpRequest, textStatus, errorThrown) {
-			alert('No Active network Connection is present!');
-			interNet = false;
+			//alert('No Active network Connection is present!');
+			interNet = true;
 			return false;
 	    }
 	});
@@ -144,10 +144,10 @@ function addInList(){
 	var qty = $("#product_qty").val();
 	var free_qty = $("#free_qty").val();
 	var temp_stock = $("#temp_stock").val();
-	if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
+	/*if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
 		alert("You can't order this product more than "+temp_stock);
 		return false;
-	}
+	}*/
 	var ean_no = $("#ean_no").val();
 	var mrp = $("#mrp").val();
 	var base_purchase_price = $("#base_purchase_price").val();
@@ -617,10 +617,10 @@ function addSaleOrder()
 	var qty = $("#product_qty").val();
 	var free_qty = $("#free_qty").val();
 	var temp_stock = $("#temp_stock").val();
-	if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
+	/*if( parseInt(temp_stock)<( parseInt(qty) + parseInt(free_qty) ) ){
 		alert("You can't order this product more than "+temp_stock);
 		return false;
-	}
+	}*/
 	var ean_no = $("#ean_no").val();
 	var mrp = $("#mrp").val();
 	var base_purchase_price = $("#base_purchase_price").val();
