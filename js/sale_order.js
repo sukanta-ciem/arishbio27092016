@@ -135,6 +135,10 @@ function addInList(){
 	var contact_no = $("#contact_no").val();
 	var special_distributor = $("#special_distributor").val();
 	var dist_id = $("#distributor_id").val();
+	if(dist_id=="" || dist_id==0){
+		alert("Enter a valid Distributor Name!");
+		return false;
+	}
 	var delivery_date = $("#datepicker1").val();
 	
 	var sku = $("#sku").val();
@@ -608,6 +612,10 @@ function addSaleOrder()
 	var contact_no = $("#contact_no").val();
 	var special_distributor = $("#special_distributor").val();
 	var dist_id = $("#distributor_id").val();
+	if(dist_id=="" || dist_id==0){
+		alert("Enter a valid Distributor Name!");
+		return false;
+	}
 	var delivery_date = $("#datepicker1").val();
 	
 	var sku = $("#sku").val();
